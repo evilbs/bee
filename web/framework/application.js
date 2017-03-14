@@ -1,9 +1,10 @@
 import axios from 'axios';
+import config from './config';
 
 const application = {
   router: {},
   doAction: function (name, params) {
-    var url = "http://120.25.194.53:3000/rpc/";
+    var url = config.rpcUrl;
     url += name;
     return axios.get(url, { params })
       .then(function (response) {

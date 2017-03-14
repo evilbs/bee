@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const router = require('koa-router')();
+const serve = require('koa-static');
 const globby = require('globby');
 const interopRequire = require('interop-require');
 const PLUGIN_DIC = '../plugins';
@@ -23,7 +24,7 @@ const boostrap = {
  * 启动应用程序入口
  * @param app koa app实例
  */
-boostrap.start = function (app) {
+boostrap.start = function (app, callback) {
   this.app = app;
   // 1. load plugin
   this.isStarting = true;
@@ -31,6 +32,19 @@ boostrap.start = function (app) {
   this.loadSystemActions();
 
   // 2. setting router 
+  this.setRouter();
+
+  // 3. generate bundle js
+  if (!fs.existsSync(distPath)) {
+    boostrap.packClient(callback);
+  }
+
+  log.debug('[bee core] load actions success.')
+  this.isStarting = false;
+}
+
+boostrap.setRouter = function () {
+  const app = this.app;
   router.get('/rpc/:key', function* () {
     let key = this.params.key;
     let action = app.actions[key];
@@ -85,16 +99,9 @@ boostrap.start = function (app) {
       this.body = result;
     }
   });
+  app.use(serve('.'));
   app.use(router.routes());
-
-  // 3. generate bundle js
-  if (!fs.existsSync(distPath)) {
-    boostrap.packClient();
-  }
-
-  log.debug('[bee core] load actions success.')
-  this.isStarting = false;
-} 
+}
 
 boostrap.loadPlugins = function (app) {
   let pluginPath = path.join(__dirname, PLUGIN_DIC);
@@ -233,6 +240,7 @@ boostrap.loadSystemActions = function () {
  * 打包前端页面
  */
 boostrap.packClient = function (callback) {
+  log.debug('[bee client] start to pack client...')
   client.pack(function (result) {
     callback && callback(result);
   });
