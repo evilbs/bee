@@ -1,6 +1,6 @@
 {
   "name": "bee",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bee is use to build a mordern web admin application much easier and more fun.",
   "main": "index.js",
   "scripts": {
