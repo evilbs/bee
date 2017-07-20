@@ -5,7 +5,7 @@ const log4js = require('log4js');
 global.log = log4js.getLogger(); 
 const bee = require('./bee'); 
 
-// hello world....  欢迎使用，测试 git 
+// hello world....  欢迎使用，测试 git，再玩一次
 
 function start() {
   app.use(serve('.'));
